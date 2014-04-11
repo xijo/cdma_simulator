@@ -32,9 +32,9 @@ body {
 }
 
 /* Customize container */
-@media (min-width: 768px) {
+@media (min-width: 998px) {
   .container {
-    max-width: 730px;
+    max-width: 960px;
   }
 }
 .container-narrow > hr {
@@ -79,10 +79,10 @@ body {
 }
 
 /* Custom stuff down here */
-
-svg {
-  overflow: visible;
-  display: block;
-  position: relative !important;
-  border: 1px solid black;
+.panel {
+  float: left;
+  width: 400px;
+  margin-left: 20px;
+  height: 800px;
+  background: yellow;
 }

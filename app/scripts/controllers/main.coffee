@@ -1,48 +1,12 @@
 'use strict'
 
 angular.module('cdmaSimulatorApp')
-  .controller 'MainCtrl', ($scope) ->
+  .controller 'MainCtrl', ($scope, Code) ->
     $scope.awesomeThings = [
       'HTML5 Boilerplate'
       'AngularJS'
       'Karma'
     ]
-
-    $scope.splitCode = (input) ->
-      input.split('').map (v) -> parseInt(v)
-
-    $scope.shiftCode = (code) ->
-      code.map (c) -> if c == 0 then -1 else 1
-
-    $scope.stretchCode = (code) ->
-      result = []
-      for c in code
-        result.push c for i in [0..7] by 1
-      result
-
-    $scope.repeatCode = (code, times = 4) ->
-      result = []
-      for i in [0..(times-1)] by 1
-        result.push c for c in code
-      result
-
-    $scope.spreadCode = (input, spreading_code) ->
-      result = []
-      for i in [0..(input.length-1)] by 1
-        result.push input[i] * spreading_code[i]
-      result
-
-    $scope.overlayCode = (code1, code2) ->
-      result = []
-      for i in [0..(code1.length-1)] by 1
-        result.push code1[i] + code2[i]
-      result
-
-    $scope.despreadCode = (overlayed_code, spreading_code) ->
-      result = []
-      for i in [0..(overlayed_code.length-1)] by 1
-        result.push overlayed_code[i] * spreading_code[i]
-      result
 
     $scope.drawCode = (code, paper, position = 0) ->
       chip_offset = 30
@@ -84,37 +48,41 @@ angular.module('cdmaSimulatorApp')
     $scope.drawText = (text, paper, x, y) ->
       paper.text(x, y, text).attr('font-size': 14, 'font-family': 'monospace')
 
-    # # # # # # # # # # # # # # # # # # # # # #
+    $scope.paper = Raphael(document.getElementById("panel1"), 400, 800)
 
-    $scope.paper = Raphael(10, 50, 800, 800)
+    $scope.updateCode = ->
 
-    input          = $scope.splitCode('1110')
-    input          = $scope.shiftCode(input)
-    input          = $scope.stretchCode(input)
-    spreading_code = $scope.splitCode('11011011')
-    spreading_code = $scope.shiftCode(spreading_code)
-    spreading_code = $scope.repeatCode(spreading_code)
+      $scope.paper.clear()
 
-    spreaded_code  = $scope.spreadCode(input, spreading_code)
+      if $scope.code1 != '' && $scope.spread1 != ''
 
-    other_code1 = [1, -1, 1, 1, -1, 1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1]
-    other_code2 = [1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, 1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1, 1]
-    overlayed_code = $scope.overlayCode(spreaded_code, other_code1)
-    overlayed_code = $scope.overlayCode(overlayed_code, other_code2)
+        length = $scope.code1.length
 
-    despreaded_code = $scope.despreadCode(overlayed_code, spreading_code)
+        input          = new Code($scope.code1)
+        input          = input.shift().stretch()
 
-    $scope.drawGrid(input, $scope.paper)
-    $scope.drawCode(input, $scope.paper)
+        spreading_code = new Code($scope.spread1)
+        spreading_code = spreading_code.shift().repeat(length)
 
-    $scope.drawGrid(spreading_code, $scope.paper, 100)
-    $scope.drawCode(spreading_code, $scope.paper, 100)
+        spreaded_code  = input.spread(spreading_code)
 
-    $scope.drawGrid(spreaded_code, $scope.paper, 200)
-    $scope.drawCode(spreaded_code, $scope.paper, 200)
+        other_code1 = new Code([1, -1, 1, 1, -1, 1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1])
+        other_code2 = new Code([1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, 1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1, 1])
+        overlayed_code = spreaded_code.overlay(other_code1).overlay(other_code2)
 
-    $scope.drawGrid(overlayed_code, $scope.paper, 300)
-    $scope.drawCode(overlayed_code, $scope.paper, 300)
+        despreaded_code = overlayed_code.despread(spreading_code)
 
-    $scope.drawGrid(despreaded_code, $scope.paper, 450)
-    $scope.drawCode(despreaded_code, $scope.paper, 450)
+        $scope.drawGrid(input.values, $scope.paper)
+        $scope.drawCode(input.values, $scope.paper)
+
+        $scope.drawGrid(spreading_code.values, $scope.paper, 100)
+        $scope.drawCode(spreading_code.values, $scope.paper, 100)
+
+        $scope.drawGrid(spreaded_code.values, $scope.paper, 200)
+        $scope.drawCode(spreaded_code.values, $scope.paper, 200)
+
+        $scope.drawGrid(overlayed_code.values, $scope.paper, 300)
+        $scope.drawCode(overlayed_code.values, $scope.paper, 300)
+
+        $scope.drawGrid(despreaded_code.values, $scope.paper, 450)
+        $scope.drawCode(despreaded_code.values, $scope.paper, 450)
