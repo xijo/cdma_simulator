@@ -36,23 +36,44 @@
 </div>
  -->
 
-<div class="row marketing">
-  <h4>Code stuff</h4>
-  <p>
-    Input code
-    <input ng-model="code1" ng-change='updateCode()'>
-  </p>
+<div class='row'>
 
-  <p>
-    Spreading code
-    <input ng-model="spread1" ng-change='updateCode()'>
-  </p>
+  <div class='col-md-6'>
+    <form role='form'>
+      <div class='form-group col-md-4'>
+        <label for='code1'>Code #1</label>
+        <input type='text' class='form-control' ng-model='code1' ng-change='updateCode(code1, spread1, panel1)' id='code1' placeholder='e.g. 1101' maxlength='4'>
+      </div>
+
+      <div class='form-group col-md-4'>
+        <label for='spread1'>Spreadcode #1</label>
+        <input type='text' class='form-control' ng-model='spread1' ng-change='updateCode(code1, spread1, panel1)' id='spread1' placeholder='e.g. 11001100' maxlength='8'>
+      </div>
+    </form>
+  </div>
+
+  <div class='col-md-6'>
+    <form role='form'>
+      <div class='form-group col-md-4'>
+        <label for='code2'>Code #2</label>
+        <input type='text' class='form-control' ng-model='code2' ng-change='updateCode(code2, spread2, panel2)' id='code2' placeholder='e.g. 1101' maxlength='4'>
+      </div>
+
+      <div class='form-group col-md-4'>
+        <label for='spread2'>Spreadcode #2</label>
+        <input type='text' class='form-control' ng-model='spread2' ng-change='updateCode(code2, spread2, panel2)' id='spread2' placeholder='e.g. 11001100' maxlength='8'>
+      </div>
+    </form>
+  </div>
+
 </div>
 
-<div class='panel' id='panel1'>
-</div>
+<div class='row'>
+  <div class='col-md-6' id='panel1' style='height: 800px'>
+  </div>
 
-<div class='panel' id='panel2'>
+  <div class='col-md-6' id='panel2' style='height: 800px'>
+  </div>
 </div>
 
 
