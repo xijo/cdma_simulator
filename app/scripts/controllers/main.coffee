@@ -1,71 +1,29 @@
 'use strict'
 
 angular.module('cdmaSimulatorApp')
-  .controller 'MainCtrl', ($scope, Code) ->
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate'
-      'AngularJS'
-      'Karma'
-    ]
+  .controller 'MainCtrl', ($scope, Code, DrawerService) ->
 
-    $scope.drawCode = (code, paper, position = 0) ->
-      chip_offset = 30
-      chip_length = 10
-
-      paths = []
-      minimum_value = _.min(code)
-      maximum_value = _.max(code)
-      occurring_values = [minimum_value..maximum_value].reverse()
-
-      for value in code
-        y = 10 + occurring_values.indexOf(value) * 20
-        paths.push "L#{chip_offset},#{position + y} L#{chip_offset + chip_length},#{position + y}"
-        chip_offset += chip_length
-
-      paper.path("M30,#{position + 50} #{paths.join(' ')}").attr(stroke: 'red')
-
-    $scope.drawGrid = (code, paper, position = 0) ->
-      chip_offset = 30
-      chip_length = 10
-
-      minimum_value = _.min(code)
-      maximum_value = _.max(code)
-      occurring_values = [minimum_value..maximum_value].reverse()
-      height = minimum_value * -1 + maximum_value + 1
-
-      offset = 10
-      for i in occurring_values by 1
-        $scope.drawText(i, paper, 10, position + offset)
-        offset += 20
-
-      for i in [0..(code.length * chip_length)] by chip_length
-        path = paper.path("M#{chip_offset + i},#{position + 0} L#{chip_offset + i},#{position + (height * 20)}")
-        if (i/chip_length % 8) == 0
-          path.attr(stroke: '#ccc', 'stroke-width': "2")
-        else
-          path.attr(stroke: '#ccc', 'stroke-width': "1", opacity: '0.5')
-
-    $scope.drawText = (text, paper, x, y) ->
-      paper.text(x, y, text).attr('font-size': 14, 'font-family': 'monospace')
-
-    $scope.panel1 = Raphael(document.getElementById('panel1'), 400, 800)
-    $scope.panel2 = Raphael(document.getElementById('panel2'), 400, 800)
+    $scope.panel1 = Raphael(document.getElementById('panel1'), 400, 300)
+    $scope.panel2 = Raphael(document.getElementById('panel2'), 400, 300)
+    $scope.panel3 = Raphael(document.getElementById('panel3'), 400, 300)
 
     $scope.updateCode = (code, spread, panel) ->
 
       panel.clear()
 
-      return if !code || !spread
+      return if !code
+      input = new Code(code)
+      input = input.shift().stretch()
+      DrawerService.draw('Data signal', input, panel)
 
-      length = code.length
-
-      input          = new Code(code)
-      input          = input.shift().stretch()
-
+      return if !spread
       spreading_code = new Code(spread)
-      spreading_code = spreading_code.shift().repeat(length)
+      spreading_code = spreading_code.shift().repeat(code.length)
+      DrawerService.draw('Spreading code', spreading_code, panel, 100)
 
-      spreaded_code  = input.spread(spreading_code)
+      return if spread.length < 8
+      spreaded_code = input.spread(spreading_code)
+      DrawerService.draw('Spreaded code', spreaded_code, panel, 200)
 
       other_code1 = new Code([1, -1, 1, 1, -1, 1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1])
       other_code2 = new Code([1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, 1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1, 1])
@@ -73,17 +31,26 @@ angular.module('cdmaSimulatorApp')
 
       despreaded_code = overlayed_code.despread(spreading_code)
 
-      $scope.drawGrid(input.values, panel)
-      $scope.drawCode(input.values, panel)
+      DrawerService.draw('Overlayed code', overlayed_code, panel, 300)
+      DrawerService.draw('Despreaded code', despreaded_code, panel, 450)
 
-      $scope.drawGrid(spreading_code.values, panel, 100)
-      $scope.drawCode(spreading_code.values, panel, 100)
+    $scope.randomSpread = (spread_number) ->
+      rest   = _.without($scope.possible_spreads, $scope.spread1, $scope.spread2)
+      random = rest[_.random(0, rest.length-1)]
+      if spread_number == 1
+        $scope.spread1 = random
+        $scope.updateCode $scope.code1, $scope.spread1, $scope.panel1
+      else
+        $scope.spread2 = random
+        $scope.updateCode $scope.code2, $scope.spread2, $scope.panel2
 
-      $scope.drawGrid(spreaded_code.values, panel, 200)
-      $scope.drawCode(spreaded_code.values, panel, 200)
-
-      $scope.drawGrid(overlayed_code.values, panel, 300)
-      $scope.drawCode(overlayed_code.values, panel, 300)
-
-      $scope.drawGrid(despreaded_code.values, panel, 450)
-      $scope.drawCode(despreaded_code.values, panel, 450)
+    $scope.possible_spreads = [
+      '11111111',
+      '10101010',
+      '11001100',
+      '10011001',
+      '11110000',
+      '10100101',
+      '11000011',
+      '10010110'
+    ]

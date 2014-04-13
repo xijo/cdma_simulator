@@ -80,9 +80,7 @@ body {
 
 /* Custom stuff down here */
 .panel {
-  float: left;
   width: 400px;
-  margin-left: 20px;
-  height: 800px;
-  background: yellow;
+  margin-left: 15px;
+  height: 310px;
 }
