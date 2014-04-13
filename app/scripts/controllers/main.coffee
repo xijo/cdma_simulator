@@ -1,48 +1,42 @@
 'use strict'
 
 angular.module('cdmaSimulatorApp')
-  .controller 'MainCtrl', ($scope, Code, DrawerService) ->
+  .controller 'MainCtrl', ($scope, Code, DrawerService, Panel) ->
 
-    $scope.panel1 = Raphael(document.getElementById('panel1'), 400, 300)
-    $scope.panel2 = Raphael(document.getElementById('panel2'), 400, 300)
-    $scope.panel3 = Raphael(document.getElementById('panel3'), 400, 300)
+    $scope.panel1       = new Panel()
+    $scope.panel1.paper = Raphael(document.getElementById('panel1'), 400, 300)
 
-    $scope.updateCode = (code, spread, panel) ->
+    $scope.panel2       = new Panel()
+    $scope.panel2.paper = Raphael(document.getElementById('panel2'), 400, 300)
 
-      panel.clear()
+    $scope.panel3       = new Panel()
+    $scope.panel3.paper = Raphael(document.getElementById('panel3'), 400, 300)
 
-      return if !code
-      input = new Code(code)
-      input = input.shift().stretch()
-      DrawerService.draw('Data signal', input, panel)
 
-      return if !spread
-      spreading_code = new Code(spread)
-      spreading_code = spreading_code.shift().repeat(code.length)
-      DrawerService.draw('Spreading code', spreading_code, panel, 100)
+    $scope.updateCode = (panel) ->
 
-      return if spread.length < 8
-      spreaded_code = input.spread(spreading_code)
-      DrawerService.draw('Spreaded code', spreaded_code, panel, 200)
+      panel.paper.clear()
 
-      other_code1 = new Code([1, -1, 1, 1, -1, 1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1])
-      other_code2 = new Code([1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, 1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1, 1])
-      overlayed_code = spreaded_code.overlay(other_code1).overlay(other_code2)
+      panel.performSpreading()
 
-      despreaded_code = overlayed_code.despread(spreading_code)
+      DrawerService.draw('Data signal', panel.data_signal, panel.paper)
+      DrawerService.draw('Spreading code', panel.spreading_code, panel.paper, 100)
+      DrawerService.draw('Spreaded code', panel.spreaded_code, panel.paper, 200)
 
-      DrawerService.draw('Overlayed code', overlayed_code, panel, 300)
-      DrawerService.draw('Despreaded code', despreaded_code, panel, 450)
+      if $scope.panel1.spreaded_code && $scope.panel2.spreaded_code
+        $scope.panel3.paper.clear()
+        overlayed_code = $scope.panel1.spreaded_code.overlay($scope.panel2.spreaded_code)
+        DrawerService.draw('Overlayed code', overlayed_code, $scope.panel3.paper)
 
-    $scope.randomSpread = (spread_number) ->
-      rest   = _.without($scope.possible_spreads, $scope.spread1, $scope.spread2)
+      # despreaded_code = overlayed_code.despread(spreading_code)
+
+      # DrawerService.draw('Despreaded code', despreaded_code, panel, 450)
+
+    $scope.randomSpread = (panel) ->
+      rest   = _.without($scope.possible_spreads, $scope.panel1.spread, $scope.panel2.spread)
       random = rest[_.random(0, rest.length-1)]
-      if spread_number == 1
-        $scope.spread1 = random
-        $scope.updateCode $scope.code1, $scope.spread1, $scope.panel1
-      else
-        $scope.spread2 = random
-        $scope.updateCode $scope.code2, $scope.spread2, $scope.panel2
+      panel.spread = random
+      $scope.updateCode panel
 
     $scope.possible_spreads = [
       '11111111',

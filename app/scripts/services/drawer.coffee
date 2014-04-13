@@ -5,11 +5,13 @@ class Drawer
     @chip_length = 10
     @border      = 30
 
-  draw: (caption, code, panel, position = 0) ->
+  draw: (caption, code, paper, position = 0) ->
+    return if !code
     values = code.values
-    @text(caption, panel, 0, position + 5)
-    @grid(values, panel, position + 20)
-    @code(values, panel, position + 20)
+    @text(caption, paper, 0, position + 5)
+    @grid(values, paper, position + 20)
+    @code(values, paper, position + 20)
+
 
   code: (code, paper, position) ->
     chip_offset = @border
@@ -27,7 +29,7 @@ class Drawer
     paper.path("M#{@border},#{position + 50} #{paths.join(' ')}").attr(stroke: 'red')
 
 
-  grid: (code, panel, position) ->
+  grid: (code, paper, position) ->
     chip_offset = @border
 
     minimum_value = _.min(code)
@@ -37,19 +39,19 @@ class Drawer
 
     offset = 10
     for i in occurring_values by 1
-      @text(i, panel, 5, position + offset)
+      @text(i, paper, 5, position + offset)
       offset += 20
 
     for i in [0..(code.length * @chip_length)] by @chip_length
-      path = panel.path("M#{chip_offset + i},#{position + 0} L#{chip_offset + i},#{position + (height * 20)}")
+      path = paper.path("M#{chip_offset + i},#{position + 0} L#{chip_offset + i},#{position + (height * 20)}")
       if (i/@chip_length % 8) == 0
         path.attr(stroke: '#ccc', 'stroke-width': "2")
       else
         path.attr(stroke: '#ccc', 'stroke-width': "1", opacity: '0.5')
 
 
-  text: (text, panel, x, y) ->
-    panel.text(x, y, text).attr('font-size': 14, 'font-family': 'monospace', 'text-anchor': 'start')
+  text: (text, paper, x, y) ->
+    paper.text(x, y, text).attr('font-size': 14, 'font-family': 'monospace', 'text-anchor': 'start')
 
 
 angular.module('cdmaSimulatorApp').service('DrawerService', Drawer)
