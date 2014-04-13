@@ -21,12 +21,12 @@ angular.module('cdmaSimulatorApp')
 
       DrawerService.draw('Data signal', panel.data_signal, panel.paper)
       DrawerService.draw('Spreading code', panel.spreading_code, panel.paper, 100)
-      DrawerService.draw('Spreaded code', panel.spreaded_code, panel.paper, 200)
+      DrawerService.draw('Transmitted (single)', panel.spreaded_code, panel.paper, 200)
 
       if $scope.panel1.spreaded_code && $scope.panel2.spreaded_code
         $scope.panel3.paper.clear()
         overlayed_code = $scope.panel1.spreaded_code.overlay($scope.panel2.spreaded_code)
-        DrawerService.draw('Overlayed code', overlayed_code, $scope.panel3.paper)
+        DrawerService.draw('Transmitted (overlayed)', overlayed_code, $scope.panel3.paper)
 
       # despreaded_code = overlayed_code.despread(spreading_code)
 
