@@ -12,14 +12,17 @@ class Drawer
     @grid(values, paper, position + 20)
     @code(values, paper, position + 20)
 
+  range: (code) ->
+    maximum_value = _.max(code)
+    if maximum_value == 0
+      maximum_value = Math.abs _.min(code)
+    minimum_value = maximum_value * -1
+    occurring_values = [minimum_value..maximum_value].reverse()
 
   code: (code, paper, position) ->
-    chip_offset = @border
-
-    paths = []
-    minimum_value = _.min(code)
-    maximum_value = _.max(code)
-    occurring_values = [minimum_value..maximum_value].reverse()
+    chip_offset      = @border
+    paths            = []
+    occurring_values = @range(code)
 
     for value in code
       y = 10 + occurring_values.indexOf(value) * 20
@@ -28,14 +31,10 @@ class Drawer
 
     paper.path("M#{@border},#{position + 50} #{paths.join(' ')}").attr(stroke: 'red')
 
-
   grid: (code, paper, position) ->
-    chip_offset = @border
-
-    minimum_value = _.min(code)
-    maximum_value = _.max(code)
-    occurring_values = [minimum_value..maximum_value].reverse()
-    height = minimum_value * -1 + maximum_value + 1
+    chip_offset      = @border
+    occurring_values = @range(code)
+    height           = _.max(occurring_values) * 2 + 1
 
     offset = 10
     for i in occurring_values by 1

@@ -12,6 +12,12 @@ angular.module('cdmaSimulatorApp')
     $scope.panel3       = new Panel()
     $scope.panel3.paper = Raphael(document.getElementById('panel3'), 400, 300)
 
+    $scope.panel4       = new Panel()
+    $scope.panel4.paper = Raphael(document.getElementById('panel4'), 400, 300)
+
+    $scope.panel5       = new Panel()
+    $scope.panel5.paper = Raphael(document.getElementById('panel5'), 400, 300)
+
 
     $scope.updateCode = (panel) ->
 
@@ -28,9 +34,14 @@ angular.module('cdmaSimulatorApp')
         overlayed_code = $scope.panel1.spreaded_code.overlay($scope.panel2.spreaded_code)
         DrawerService.draw('Transmitted (overlayed)', overlayed_code, $scope.panel3.paper)
 
-      # despreaded_code = overlayed_code.despread(spreading_code)
+        $scope.panel4.paper.clear()
+        despreaded_code = overlayed_code.despread($scope.panel1.spreading_code)
+        DrawerService.draw('Despreaded code', despreaded_code, $scope.panel4.paper)
 
-      # DrawerService.draw('Despreaded code', despreaded_code, panel, 450)
+        $scope.panel5.paper.clear()
+        despreaded_code = overlayed_code.despread($scope.panel2.spreading_code)
+        DrawerService.draw('Despreaded code', despreaded_code, $scope.panel5.paper)
+
 
     $scope.randomSpread = (panel) ->
       rest   = _.without($scope.possible_spreads, $scope.panel1.spread, $scope.panel2.spread)
