@@ -48,7 +48,6 @@ class Drawer
       else
         path.attr(stroke: '#ccc', 'stroke-width': "1", opacity: '0.5')
 
-
   text: (text, paper, x, y) ->
     paper.text(x, y, text).attr('font-size': 14, 'font-family': 'monospace', 'text-anchor': 'start')
 

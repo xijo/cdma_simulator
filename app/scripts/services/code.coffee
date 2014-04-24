@@ -32,7 +32,6 @@ angular.module('cdmaSimulatorApp')
         new Code(result)
 
       # Spread this code with given other one
-      # TODO raise if length does not match
       spread: (other_code) ->
         result = []
         for i in [0..(@values.length-1)] by 1
